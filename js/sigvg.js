@@ -274,6 +274,7 @@ function initSigVG(options = {}) {
 
     function draw(e) {
         drawing = true;
+        e.preventDefault();
         if (pts.length) {
             appendToBuffer(buffer, getMouseOrTouchPos(e, ctm));
             updateSvgPath();
@@ -281,6 +282,7 @@ function initSigVG(options = {}) {
     }
 
     function drawStart(e) {
+        e.preventDefault();
         drawing = true;
         let pt = getMouseOrTouchPos(e, ctm);
         appendToBuffer(buffer, pt);
@@ -356,8 +358,8 @@ function initSigVG(options = {}) {
         ) {
             let evt = typeof e.originalEvent === "undefined" ? e : e.originalEvent;
             let touch = evt.touches[0] || evt.changedTouches[0];
-            x = touch.pageX;
-            y = touch.pageY;
+            x = touch.pageX - window.scrollX;
+            y = touch.pageY - window.scrollY;
         } else if (
             e.type == "mousedown" ||
             e.type == "mouseup" ||
@@ -874,6 +876,8 @@ function pathDataToD(pathData, decimals = -1, minify = false) {
 }
 
 
+
+
 /*
  (c) 2017, Vladimir Agafonkin
  Simplify.js, a high-performance JS polyline simplification library
@@ -961,3 +965,5 @@ function simplifyPolygon(points, tolerance = 0.5) {
 
     return points;
 }
+
+
