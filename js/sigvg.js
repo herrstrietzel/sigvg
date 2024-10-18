@@ -39,7 +39,7 @@ function initSigVG(options = {}) {
         targetOutput: null,
         width: 640,
         height: 360,
-        strokeWidth: 2,
+        strokeWidth: '1%',
 
         // smoothing and simplification
         smooth: 4, // input jitter correction
@@ -195,11 +195,6 @@ function initSigVG(options = {}) {
      * 2. simplify polygon
      * 3. polygon to bézier via Chord-Length Parameterization
      */
-
-    smooth = 6;
-    tension = 0.15;
-    simplify = 0.3;
-    decimals=1
 
     let bufferSize = smooth;
     let buffer = [];
@@ -965,5 +960,4 @@ function simplifyPolygon(points, tolerance = 0.5) {
 
     return points;
 }
-
 
