@@ -167,7 +167,7 @@ function initSigVG(options = {}) {
             let el = svg;
 
             // convert to file
-            let fileUrl = await sigvgToFile(el, format, quality, scale, flattenTransparency);
+            let fileUrl = await svgToFile(el, format, quality, scale, flattenTransparency);
             linkDownload.href = fileUrl;
             linkDownload.download = `signature.${format}`;
             linkDownload.click();
@@ -200,7 +200,7 @@ function initSigVG(options = {}) {
     let buffer = [];
 
 
-    function updateSvgPath() {
+    const updateSvgPath = () =>{
         let pt = getAveragePoint(0);
 
         if (pt) {
@@ -230,7 +230,7 @@ function initSigVG(options = {}) {
     /**
      * end draw and optimize
      */
-    function drawEnd() {
+    const drawEnd = ()=>{
 
         // start new pathData for drawing
         if (pts.length > 1) {
@@ -248,7 +248,7 @@ function initSigVG(options = {}) {
             pathData.push(...pathDataSeg)
 
             // convert to relative
-            let pathDataConverted = JSON.parse(JSON.stringify(pathData)).toShorthands().toRelative(decimals)
+            let pathDataConverted = pathDataToRelative( pathDataToShorthands( JSON.parse(JSON.stringify(pathData)) ), decimals);
 
             // render optimized path
             let d = pathDataConverted.toD(decimals, true);
@@ -267,7 +267,7 @@ function initSigVG(options = {}) {
     };
 
 
-    function draw(e) {
+    const draw = (e)=>{
         drawing = true;
         e.preventDefault();
         if (pts.length) {
@@ -276,7 +276,7 @@ function initSigVG(options = {}) {
         }
     }
 
-    function drawStart(e) {
+    const drawStart = (e)=>{
         e.preventDefault();
         drawing = true;
         let pt = getMouseOrTouchPos(e, ctm);
@@ -324,7 +324,7 @@ function initSigVG(options = {}) {
 
 
     //reset
-    function clearDrawing(path, targetOutput = null) {
+    const clearDrawing = (path, targetOutput = null) =>{
         path.setAttribute('d', '')
         pathDataStr = '';
         pts = [];
@@ -340,8 +340,7 @@ function initSigVG(options = {}) {
     }
 
 
-
-    function getMouseOrTouchPos(e, ctm) {
+    const getMouseOrTouchPos = (e, ctm)=>{
         let x, y;
 
         // touch cooordinates
@@ -376,7 +375,7 @@ function initSigVG(options = {}) {
     }
 
 
-    function appendToBuffer(buffer, pt) {
+    const appendToBuffer = (buffer, pt)=>{
         buffer.push(pt);
         if(buffer.length<2) return;
 
@@ -386,7 +385,7 @@ function initSigVG(options = {}) {
     };
 
     // Calculate the average point, starting at offset in the buffer
-    function getAveragePoint(offset) {
+    const getAveragePoint = (offset)=>{
         if(buffer.length<2) return buffer[0];
 
         let pts = buffer.slice(offset);
@@ -398,7 +397,7 @@ function initSigVG(options = {}) {
 
 
 
-    async function sigvgToFile(el, format, quality = 0.9, scale = 1, flattenTransparency = false) {
+    async function svgToFile(el, format, quality = 0.9, scale = 1, flattenTransparency = false) {
 
         //normalize format string
         format = format.toLowerCase().replaceAll('jpeg', 'jpg')
@@ -559,10 +558,6 @@ function getCurvePathData(points, smoothing = 0.2, closed = false) {
  * convert path data
  */
 
-Array.prototype.toRelative = function (decimals = -1) {
-    return pathDataToRelative(this, decimals);
-}
-
 /**
      * This is just a port of Dmitry Baranovskiy's 
      * pathToRelative/Absolute methods used in snap.svg
@@ -653,11 +648,6 @@ function pathDataToRelative(pathData, decimals = -1) {
         }
     }
     return pathData;
-}
-
-
-Array.prototype.toShorthands = function (decimals = -1) {
-    return pathDataToShorthands(this, decimals);
 }
 
 
@@ -883,7 +873,7 @@ function pathDataToD(pathData, decimals = -1, minify = false) {
 // for 3D version, see 3d branch (configurability would draw significant performance overhead)
 
 // square distance between 2 points
-function getSqDist(p1, p2) {
+const getSqDist = (p1, p2)=>{
 
     let dx = p1.x - p2.x,
         dy = p1.y - p2.y;
@@ -892,7 +882,7 @@ function getSqDist(p1, p2) {
 }
 
 // square distance from a point to a segment
-function getSqSegDist(p, p1, p2) {
+const getSqSegDist = (p, p1, p2) => {
 
     let x = p1.x,
         y = p1.y,
@@ -920,7 +910,7 @@ function getSqSegDist(p, p1, p2) {
 }
 
 
-function simplifyDPStep(points, first, last, sqTolerance, simplified) {
+const simplifyDPStep = (points, first, last, sqTolerance, simplified)=> {
     let maxSqDist = sqTolerance,
         index;
 
@@ -941,7 +931,7 @@ function simplifyDPStep(points, first, last, sqTolerance, simplified) {
 }
 
 // simplification using Ramer-Douglas-Peucker algorithm
-function simplifyDouglasPeucker(points, sqTolerance) {
+const simplifyDouglasPeucker = (points, sqTolerance) => {
     let last = points.length - 1;
 
     let simplified = [points[0]];
@@ -952,7 +942,7 @@ function simplifyDouglasPeucker(points, sqTolerance) {
 }
 
 // both algorithms combined for awesome performance
-function simplifyPolygon(points, tolerance = 0.5) {
+const simplifyPolygon = (points, tolerance = 0.5)=>{
 
     if (points.length <= 2) return points;
     let sqTolerance = tolerance !== undefined ? tolerance * tolerance : 1;
@@ -960,4 +950,3 @@ function simplifyPolygon(points, tolerance = 0.5) {
 
     return points;
 }
-
